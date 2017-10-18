@@ -1,24 +1,30 @@
 <link rel="import" href="../polymer/polymer.html">
 
+<link rel="import" href="st-rest.html">
+
 <dom-module id="st-settings">
     <template>     
+        <st-rest id="rest" on-getdone='_configReceived'></st-rest>
     </template>
 
     <script>
         Polymer({
             is:'st-settings',
-            properties: {                
-            },            
+            properties: {        
+            },  
+            _configReceived(res){
+                this.cfg = res.detail.response;
+                this._setGlobals();
+            },
+            _setGlobals(){
+                window.st = {};
+                window.st.endpoint = this.cfg.endpoint ?  this.cfg.endpoint : "http://localhost:8080/v1.0";
+                window.st.maxEntities = this.cfg.maxEntities ? this.cfg.maxEntities : 20;
+            }   ,
             ready(){
-                var _self = this;
-
-                $.get('client_config.json',function(data){
-                    _self.config = $.parseJSON(data);
-                    console.log(_self.config);
-                });
-
-                window.st.endpoint = this.config.endpoint ?  this.config.endpoint : "http://localhost:8080/v1.0";
-                window.st.maxEntities = this.config.maxEntities ? this.config.maxEntities : 20;
+                this.cfg = {};
+                this._setGlobals();
+                this.$.rest.get('client_config.json');
             }
         });
     </script>
