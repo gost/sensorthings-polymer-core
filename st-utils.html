@@ -1,0 +1,54 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+
+<dom-module id="st-utils">
+    <template>
+    </template>
+    <script>
+        Polymer({
+            is:'st-utils',
+            properties: {
+                baseurl: {
+                    type: String
+                },
+                paths: {
+                    type: Object,
+                    value: {
+                        'thing': {single: "/Thing", array: "/Things" }, 
+                        'location': {single: "/Location", array: "/Locations" }, 
+                        'historicallocation': {single: "/HistoricalLocation", array: "/HistoricalLocations" }, 
+                        'datastream': {single: "/Datastream", array: "/Datastreams" }, 
+                        'sensor': {single: "/Sensor", array: "/Sensors" }, 
+                        'observedproperty': {single: "/ObservedProperty", array: "/ObservedProperties" }, 
+                        'observation': {single: "/Observation", array: "/Observations" }, 
+                        'featureofinterest': {single: "/FeatureOfInterest", array: "/FeaturesOfInterest" }, 
+                    },
+                    readOnly: true,
+                }
+            },
+
+            // create path to endpoint
+            getPath(entity, id, byEntity, single){
+                if(!id && !byEntity) { // only entity is given, get array endpoint for entity
+                    return this.baseurl + this.paths[entity].array;
+                } else if(!byEntity) { // id is given get single entity endpoint
+                    return this.baseurl + this.paths[entity].array + '(' + id + ')';
+                } else { // get single or array entity by other entity, if single is true get the single endpoint else get the array endpoint
+                    return this.baseurl + this.paths[byEntity].array + '(' + id + ')' + (single ? this.paths[entity].single : this.paths[entity].array);
+                }                    
+            },
+
+            updateOdataForNextLink(odata, nextLink){
+                var urlParams = new URLSearchParams(nextLink);
+                odata.top = urlParams.get('$top');
+                odata.skip = urlParams.get('$skip');
+            },
+
+            ready() {
+                if(!this.baseurl){
+                    this.baseurl = window.st.endpoints;
+                }
+            },
+        });
+    </script>
+</dom-module>

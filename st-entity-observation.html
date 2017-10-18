@@ -1,0 +1,123 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<link rel="import" href="st-repository-observation.html">
+
+<dom-module id="st-entity-observation">
+    <template>     
+        <st-repository-observation id="observationrepo" baseurl='{{baseurl}}' on-getdone='_observationReceived' on-deletedone='_deleteDone'></st-repository-observation>
+    </template>
+
+    <script>
+        Polymer({
+            is:'st-entity-observation',
+            properties: {
+                auto: {
+                    type: Boolean,
+                    value: false
+                },
+                odata: {
+                    type: Object
+                },
+                rawreceived: {
+                    type: Object,
+                    notify: true,
+                    observer: '_rawChanged'
+                },
+                gid: {
+                    type: Number,
+                    notify: true
+                },
+                selflink: {
+                    type: String,
+                    notify: true
+                },
+                phenomenontime: {
+                    type: String,
+                    notify: true
+                },
+                resulttime: {
+                    type: String,
+                    notify: true
+                },
+                result: { 
+                    type: Object,
+                    notify: true
+                },
+                resultquality: { 
+                    type: String,
+                    notify: true
+                },
+                parameters: { 
+                    type: Object,
+                    notify: true
+                },
+                datastreamurl: {
+                    type: String,
+                    notify: true
+                },
+                featureofinteresturl: {
+                    type: String,
+                    notify: true
+                },
+                baseurl: {
+                    type: String,
+                    notify: true
+                },
+                deleted: {
+                    type: Boolean,
+                    notify: true,
+                    value: false
+                }
+            },
+            _observationReceived(res){    	
+                this.rawreceived = res.detail.response;
+            },         
+            _deleteDone(res){                
+                this.deleted = true;
+            },
+            _rawChanged(){
+                if(this.rawreceived['@iot.id']) { this.gid = this.rawreceived['@iot.id']; }
+                if(this.rawreceived.phenomenonTime) { this.phenomenontime = this.rawreceived.phenomenonTime; }
+                if(this.rawreceived.resultTime) { this.resulttime = this.rawreceived.resultTime; }
+                if(this.rawreceived.result) { this.result = this.rawreceived.result; }
+                if(this.rawreceived.resultQuality) { this.resultquality = this.rawreceived.resultQuality; }
+                if(this.rawreceived.parameters) { this.parameters = this.rawreceived.parameters; }
+                if(this.rawreceived['@iot.selfLink']) { this.selflink = this.rawreceived['@iot.selfLink']; }
+                if(this.rawreceived['Datastream@iot.navigationLink']) { this.datastreamurl = this.rawreceived['Datastream@iot.navigationLink']; }
+                if(this.rawreceived['FeatureOfInterest@iot.navigationLink']) { this.featureofinteresturl = this.rawreceived['FeatureOfInterest@iot.navigationLink']; }   
+                if(this.rawreceived.FeatureOfInterest){ this.featureofinterest = this.rawreceived.FeatureOfInterest; }        
+                if(this.rawreceived.Datastream){ this.datastreams = this.rawreceived.Datastream; }
+            },
+            get(id){
+                if(id){
+                    this.gid = id;
+                }
+              
+                this.$.observationrepo.getByID(this.gid, this.odata);    
+            },         
+            put(){                
+                this.$.observationrepo.put(this.gid, this._createObservation());
+            },
+            patch(){
+                this.$.observationrepo.patch(this.gid, this._createObservation());
+            },
+            delete(){
+                this.$.observationrepo.delete(this.gid);
+            },
+            _createObservation(){
+                return {
+                    phenomenonTime: this.phenomenontime,
+                    resultTime: this.resulttime,
+                    result: this.result,
+                    resultQuality: this.resultquality,
+                    parameters: this.parameters
+                };
+            },
+            ready(){
+                if(this.auto){
+                    this.get();
+                }
+            }
+        });
+    </script>
+</dom-module>

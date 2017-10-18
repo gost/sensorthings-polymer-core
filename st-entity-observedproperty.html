@@ -1,0 +1,124 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<link rel="import" href="st-repository-observedproperty.html">
+
+<dom-module id="st-entity-observedproperty">
+    <template>     
+        <st-repository-observedproperty id="observedpropertyrepo" baseurl='{{baseurl}}' on-getdone='_observedPropertyReceived' on-deletedone='_deleteDone'></st-repository-observedproperty>
+    </template>
+
+    <script>
+        Polymer({
+            is:'st-entity-observedproperty',
+            properties: {
+                auto: {
+                    type: Boolean,
+                    value: false
+                },
+                odata: {
+                    type: Object
+                },
+                rawreceived: {
+                    type: Object,
+                    notify: true,
+                    observer: '_rawChanged'
+                },
+                gid: {
+                    type: Number,
+                    notify: true
+                },
+                datastreamid: {
+                    type: Number,
+                    notify: true
+                },
+                selflink: {
+                    type: String,
+                    notify: true
+                },
+                name: {
+                    type: String,
+                    notify: true
+                },
+                description: {
+                    type: String,
+                    notify: true
+                },
+                definition: { 
+                    type: String,
+                    notify: true
+                },
+                datastreamsurl: {
+                    type: String,
+                    notify: true
+                },
+                datastreams: {
+                    type: Array,
+                    notify: true
+                },   
+                baseurl: {
+                    type: String,
+                    notify: true
+                },
+                deleted: {
+                    type: Boolean,
+                    notify: true,
+                    value: false
+                }
+            },
+            _observedPropertyReceived(res){    	
+                this.rawreceived = res.detail.response;
+            },         
+            _deleteDone(res){                
+                this.deleted = true;
+            },
+            _rawChanged(){
+                if(this.rawreceived['@iot.id']) { this.gid = this.rawreceived['@iot.id']; }
+                if(this.rawreceived.name) { this.name = this.rawreceived.name; }
+                if(this.rawreceived.description) { this.description = this.rawreceived.description; }
+                if(this.rawreceived.definition) { this.definition = this.rawreceived.definition; }
+                if(this.rawreceived['@iot.selfLink']) { this.selflink = this.rawreceived['@iot.selfLink']; }
+                if(this.rawreceived['Datastreams@iot.navigationLink']) { this.datastreamsurl = this.rawreceived['Datastreams@iot.navigationLink']; } 
+                if(this.rawreceived.Datastreams){ this.datastreams = this.rawreceived.Datastreams; }
+            },
+            get(id){
+                if(id){
+                    this.gid = id;
+                }
+
+                if (this.datastreamid) {
+                    this.getByDatastream();
+                } else {
+                    this.$.sensorrepo.getByID(this.gid, this.odata);
+                }               
+            },
+            getByDatastream(datastreamID){
+                if(datastreamID){
+                    this.datastreamid = datastreamID;
+                }
+
+                this.$.sensorrepo.getByDatastream(this.datastreamid, this.odata);
+            },     
+            put(){                
+                this.$.sensorrepo.put(this.gid, this._createObservedPropertyObject());
+            },
+            patch(){
+                this.$.sensorrepo.patch(this.gid, this._createObservedPropertyObject());
+            },
+            delete(){
+                this.$.sensorrepo.delete(this.gid);
+            },
+            _createObservedPropertyObject(){
+                return {
+                    name: this.name,
+                    description: this.description,
+                    definition: this.definition                    
+                };
+            },
+            ready(){
+                if(this.auto){
+                    this.get();
+                }
+            }
+        });
+    </script>
+</dom-module>

@@ -1,0 +1,169 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<link rel="import" href="st-repository-datastream.html">
+
+<dom-module id="st-entity-datastream">
+    <template>     
+        <st-repository-datastream id="datastreamrepo" baseurl='{{baseurl}}' on-getdone='_datastreamReceived' on-deletedone='_deleteDone'></st-repository-datastream>
+    </template>
+
+    <script>
+        Polymer({
+            is:'st-entity-datastream',
+            properties: {
+                auto: {
+                    type: Boolean,
+                    value: false
+                },
+                odata: {
+                    type: Object
+                },
+                rawreceived: {
+                    type: Object,
+                    notify: true,
+                    observer: '_rawChanged'
+                },
+                gid: {
+                    type: Number,
+                    notify: true
+                },
+                observationid: {
+                    type: Number,
+                    notify: true
+                },
+                selflink: {
+                    type: String,
+                    notify: true
+                },
+                name: {
+                    type: String,
+                    notify: true
+                },
+                description: {
+                    type: String,
+                    notify: true
+                },
+                observationtype: { 
+                    type: Object,
+                    notify: true
+                },
+                unitofmeasurement: { 
+                    type: Object,
+                    notify: true
+                },
+                phenomenontime: { 
+                    type: String,
+                    notify: true
+                },
+                resulttime: {
+                    type: String,
+                    notify: true
+                },
+                observedarea: { 
+                    type: Object,
+                    notify: true
+                },
+                thingurl: {
+                    type: String,
+                    notify: true
+                },
+                sensorurl: {
+                    type: String,
+                    notify: true
+                },
+                observationsurl: {
+                    type: String,
+                    notify: true
+                },
+                observedpropertyurl: {
+                    type: String,
+                    notify: true
+                },
+                thing: {
+                    type: Object,
+                    notify: true
+                },
+                sensor: {
+                    type: Object,
+                    notify: true
+                },
+                observedproperty: {
+                    type: Object,
+                    notify: true
+                },
+                observations: {
+                    type: Array,
+                    notify: true
+                },
+                deleted: {
+                    type: Boolean,
+                    notify: true,
+                    value: false
+                }
+            },
+            _datastreamReceived(res){    	
+                this.rawreceived = res.detail.response;
+            },         
+            _deleteDone(res){                
+                this.deleted = true;
+            },
+            _rawChanged(){
+                if(this.rawreceived['@iot.id']) { this.gid = this.rawreceived['@iot.id']; }
+                if(this.rawreceived.name) { this.name = this.rawreceived.name; }
+                if(this.rawreceived.description) { this.description = this.rawreceived.description; }
+                if(this.rawreceived.observationType) { this.observationtype = this.rawreceived.observationType; }
+                if(this.rawreceived.unitOfMeasurement) { this.unitofmeasurement = this.rawreceived.unitOfMeasurement; }
+                if(this.rawreceived.resultTime) { this.resulttime = this.rawreceived.resultTime; }
+                if(this.rawreceived.phenomenonTime) { this.phenomenontime = this.rawreceived.phenomenonTime; }
+                if(this.rawreceived.observedArea) { this.observedarea = this.rawreceived.observedArea; }
+                if(this.rawreceived['@iot.selfLink']) { this.selflink = this.rawreceived['@iot.selfLink']; }
+                if(this.rawreceived['Thing@iot.navigationLink']) { this.thingurl = this.rawreceived['Thing@iot.navigationLink']; }
+                if(this.rawreceived['ObservedProperty@iot.navigationLink']) { this.observedpropertyurl = this.rawreceived['ObservedProperty@iot.navigationLink']; }
+                if(this.rawreceived['Observations@iot.navigationLink']) { this.observationsurl = this.rawreceived['Observations@iot.navigationLink']; }
+                if(this.rawreceived.Thing){ this.thing = this.rawreceived.Thing; }      
+                if(this.rawreceived.ObservedProperty){ this.observedproperty = this.rawreceived.ObservedProperty; }        
+                if(this.rawreceived.Observations){ this.observations = this.rawreceived.Observations; }
+            },
+            get(id){
+                if(id){
+                    this.gid = id;
+                }
+
+                if (this.observationid) {
+                    this.getByObservation();
+                } else {
+                    this.$.datastreamrepo.getByID(this.gid, this.odata);
+                }               
+            },
+            getByObservation(observationID){
+                if(observationID){
+                    this.observationid = observationID;
+                }
+
+                this.$.datastreamrepo.getByObservation(this.observationid, this.odata);
+            },            
+            put(){                
+                this.$.datastreamrepo.put(this.gid, this._createDatastreamObject());
+            },
+            patch(){
+                this.$.datastreamrepo.patch(this.gid, this._createDatastreamObject());
+            },
+            delete(){
+                this.$.datastreamrepo.delete(this.gid);
+            },
+            _createDatastreamObject(){
+                return {
+                    name: this.name,
+                    description: this.description,
+                    observationType: this.observationtype,
+                    unitOfMeasurement: this.unitofmeasurement                    
+                };
+            },
+            ready(){
+                if(this.auto){
+                    this.get();
+                }
+            }
+        });
+    </script>
+</dom-module>

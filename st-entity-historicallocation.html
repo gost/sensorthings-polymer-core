@@ -1,0 +1,107 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<link rel="import" href="st-repository-historicallocation.html">
+
+<dom-module id="st-entity-historicallocation">
+    <template>     
+        <st-repository-historicallocation id="historicallocationrepo" baseurl='{{baseurl}}' on-getdone='_historicalLocationReceived' ></st-repository-historicallocation>            
+    </template>
+
+    <script>
+        Polymer({
+            is:'st-entity-historicallocation',
+            properties: {
+                auto: {
+                    type: Boolean,
+                    value: false
+                },
+                odata: {
+                    type: Object
+                },
+                rawreceived: {
+                    type: Object,
+                    notify: true,
+                    observer: '_rawChanged'
+                },
+                gid: {
+                    type: Number,
+                    notify: true
+                },
+                selflink: {
+                    type: String,
+                    notify: true
+                },
+                time: {
+                    type: String,
+                    notify: true
+                },                
+                thingsurl: {
+                    type: String,
+                    notify: true
+                },
+                locationsurl: {
+                    type: String,
+                    notify: true
+                },
+                baseurl: {
+                    type: String,
+                    notify: true
+                },
+                things: {
+                    type: Array,
+                    notify: true
+                },
+                locations: {
+                    type: Array,
+                    notify: true
+                },               
+                deleted: {
+                    type: Boolean,
+                    notify: true,
+                    value: false
+                }
+            },
+            _historicalLocationReceived(res){
+                this.rawreceived = res.detail.response;
+            },           
+            _deleteDone(res){                
+                this.deleted = true;
+            },
+            _rawChanged(){
+                if(this.rawreceived['@iot.id']) { this.gid = this.rawreceived['@iot.id']; }
+                if(this.rawreceived.time) { this.time = this.rawreceived.time; }
+                if(this.rawreceived['@iot.selfLink']) { this.selflink = this.rawreceived['@iot.selfLink']; }
+                if(this.rawreceived['Things@iot.navigationLink']) { this.thingsurl = this.rawreceived['Things@iot.navigationLink']; }
+                if(this.rawreceived['Locations@iot.navigationLink']) { this.locationsurl = this.rawreceived['Locations@iot.navigationLink']; }            
+                if(this.rawreceived.Locations){ this.locations = this.rawreceived.Locations; }        
+                if(this.rawreceived.Things){ this.things = this.rawreceived.Things; }
+            },
+            get(id){
+                if(id){
+                    this.gid = id;
+                }
+
+                this.$.historicallocationrepo.getByID(this.gid, this.odata); 
+            },  
+            put(){                
+                this.$.historicallocationrepo.put(this.gid, this._createHistoricalLocationObject());
+            },
+            patch(){
+                this.$.historicallocationrepo.patch(this.gid, this._createHistoricalLocationObject());
+            },
+            delete(){
+                this.$.historicallocationrepo.delete(this.gid);
+            },
+            _createHistoricalLocationObject(){
+                return {
+                    time: this.time
+                };
+            },
+            ready(){
+                if(this.auto){
+                    this.get();
+                }
+            }
+        });
+    </script>
+</dom-module>

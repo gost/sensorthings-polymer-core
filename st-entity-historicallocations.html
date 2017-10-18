@@ -1,0 +1,102 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<link rel="import" href="st-repository-historicallocation.html">
+<link rel="import" href="st-utils.html">
+
+<dom-module id="st-entity-historicallocations" odata="{{odata}}">
+    <template>     
+        <st-repository-historicallocation id="historicallocationrepo" baseurl='{{baseurl}}' on-getdone='_historicalLocationsReceived'></st-repository-historicallocatio>
+        <st-utils id="utils" baseurl='{{baseurl}}'></st-utils>
+    </template>
+
+    <script>
+        Polymer({
+            is:'st-entity-historicallocations',
+            properties: {
+                auto: {
+                    type: Boolean,
+                    value: false
+                },
+                baseurl: {
+                    type: String,
+                    notify: true
+                },
+                odata: {
+                    type: Object
+                },
+                thingid: {
+                    type: Number,
+                    notify: true
+                },
+                locationid: {
+                    type: Number,
+                    notify: true
+                },
+                collection: {
+                    type: Array,
+                    notify: true
+                },            
+                count: {
+                    type: Number,
+                    notify: true
+                },
+                nextlink: {
+                    type: String,
+                    notify: true
+                }
+            },
+            _historicalLocationsReceived(res){
+                var data = res.detail.response;
+                if(data['@iot.count']) { this.count = data['@iot.count']; }                
+                if(data.value) { this.collection = data.value; }
+                this.nextlink = data['@iot.nextLink'] ? data['@iot.nextLink'] : "";                
+            },
+            get(){
+                if(this.thingid) {
+                    this.getByThing();
+                } else if (this.locationid) {
+                    this.getByLocation();
+                } else {
+                    this.$.historicallocationrepo.get(this.odata);
+                }                
+            },
+            getByThing(thingID){
+                if(thingID){
+                    this.thingid = thingID;
+                }
+
+                this.$.historicallocationrepo.getByThing(this.thingid, this.odata);
+            },
+            getByLocation(locationID){
+                if(locationID){
+                    this.locationid = locationID;
+                }
+
+                this.$.historicallocationrepo.getByLocation(this.locationID, this.odata);
+            },
+            getNextPage(){
+                if(this.nextlink) {
+                    this.$.utils.updateOdataForNextLink(this.odata, this.nextlink);
+                    this.get();
+                } else {
+                    throw "No nextlink available";
+                }
+            },
+            post(data){
+                this.$.locationrepo.post(data);
+            },
+            postByThing(thingID, data){
+                if(thingID){
+                    this.thingid = thingID;
+                }
+
+                this.$.locationrepo.postByThing(this.thingid, data);
+            },
+            ready(){
+                if(this.auto){
+                   this.get();
+                }
+            }
+        });
+    </script>
+</dom-module>

@@ -1,0 +1,65 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<link rel="import" href="st-rest.html">
+<link rel="import" href="st-utils.html">
+<link rel="import" href="st-odata.html">
+
+<dom-module id="st-repository-thing">
+    <template>
+        <st-rest id="rest" ></st-rest>
+        <st-utils id="utils" baseurl='{{baseurl}}'></st-utils>
+        <st-odata id="odata"></st-odata>
+    </template>
+    <script>
+        Polymer({
+            is:'st-repository-thing',
+            properties: {
+                baseurl: {
+                    type: String,
+                    notify: true
+                },
+                thingproperties: { 
+                    type: Array,
+                    value: ['id', 'name', 'description', 'properties'],
+                    readOnly: true,
+                },
+                expandproperties: {
+                    type: Array,
+                    value: ['Locations', 'HistoricalLocations', 'Datastreams'],
+                    readOnly: true,
+                }                      
+            },         
+            _checkODATA(odata){
+                var correct = this.$.odata.check('thing', odata);
+            },
+
+            get(odata){        
+                this.$.rest.get(this.$.utils.getPath('thing'), odata);
+            },
+            getByID(thingID, odata){                
+                this.$.rest.get(this.$.utils.getPath('thing', thingID), odata);
+            },
+            getByHistoricalLocation(historicalLocationID, odata){
+                this.$.rest.get(this.$.utils.getPath('thing', historicalLocationID, 'historicallocation', true), odata);
+            },
+            getByDatastream(datastreamID, odata){
+                this.$.rest.get(this.$.utils.getPath('thing', datastreamID, 'datastream', true), odata);
+            },
+            getByLocation(locationID, odata){
+                this.$.rest.get(this.$.utils.getPath('thing', locationID, 'location', false), odata);
+            },
+            post(data){
+                this.$.rest.post(this.$.utils.getPath('thing'), data);
+            },
+            put(id, data){
+                this.$.rest.put(this.$.utils.getPath('thing', id), data);
+            },
+            patch(id, data){
+                this.$.rest.patch(this.$.utils.getPath('thing', id), data);
+            },
+            delete(id){
+                this.$.rest.delete(this.$.utils.getPath('thing', id));
+            }
+        });
+    </script>
+</dom-module>

@@ -1,0 +1,25 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<dom-module id="st-settings">
+    <template>     
+    </template>
+
+    <script>
+        Polymer({
+            is:'st-settings',
+            properties: {                
+            },            
+            ready(){
+                var _self = this;
+
+                $.get('client_config.json',function(data){
+                    _self.config = $.parseJSON(data);
+                    console.log(_self.config);
+                });
+
+                window.st.endpoint = this.config.endpoint ?  this.config.endpoint : "http://localhost:8080/v1.0";
+                window.st.maxEntities = this.config.maxEntities ? this.config.maxEntities : 20;
+            }
+        });
+    </script>
+</dom-module>

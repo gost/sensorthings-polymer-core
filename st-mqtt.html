@@ -1,0 +1,149 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
+<!--
+<link rel="import" href="../mqtt-elements/mqtt-connection.html">
+<link rel="import" href="../mqtt-elements/mqtt-subscription.html">
+-->
+
+<dom-module id="st-mqtt">
+    <template>
+		<!--
+    <mqtt-connection
+        id="connection"
+        url="[[url]]"
+        connected="{{connected}}"
+        client="{{client}}"
+        subscriptions="{{subscriptions}}"
+        options='{{options}}'
+        on-mqtt-message='onMessageArrived'
+		on-mqtt-connection-close='onConnectionLost'
+		on-mqtt-connection-error='onConnectionError'>
+    </mqtt-connection>
+	-->
+    </template>
+
+
+<script>
+
+Polymer({
+    is:'st-mqtt',
+		properties() {return {
+			url: {
+				type: String,
+				value: 'gost.geodan.nl'
+			},
+			port: {
+				type: Number,
+				value: 9001
+			},
+			client: {
+				type: Object,
+				notify: true
+			},
+			connected: {
+				type: Boolean,
+				value: false,
+				notify: true
+			},
+			self: { 
+                type: Object 
+            },
+		}},
+		observers(){return [
+			
+		]},
+		ready(){
+			//Got this from https://github.com/gost/dashboard/blob/master/content/js/app.js
+			function guid() {
+				function s4() {
+					return Math.floor((1 + Math.random()) * 0x10000)
+					.toString(16)
+					.substring(1);
+				}
+				return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+					s4() + '-' + s4() + s4() + s4();
+			}					
+
+			super.ready();			
+			var self = this;
+			this.client = new Paho.MQTT.Client(String(this.url), Number(this.port), guid());
+			this.client.onConnectionLost = this.onConnectionLost;
+			this.client.onMessageArrived = this.onMessageArrived.bind(this); // bind to this (ECMAScript5)
+		},
+		connect(){
+			var self=this;
+			function onConnect() {
+				self.dispatchEvent(new CustomEvent('connected'));
+				console.log('MQTT connected');
+				self.connected = true;				
+			}
+			this.client.connect({ onSuccess: onConnect });
+		},
+		subscribe(topic){
+			this.client.subscribe(topic);
+		},
+		send(topic, content){
+			var message = new Paho.MQTT.Message(JSON.stringify(content));
+        	message.destinationName = topic;
+        	this.client.send(message);
+		},
+		onMessageArrived(message) {
+			if(message && message.destinationName) {
+				var data = {
+					topic: message.destinationName,
+					message: JSON.parse(message.payloadString)
+				};
+
+				this.dispatchEvent(new CustomEvent('message', { detail: data}));					
+			}
+			/* 
+			switch (message.topic) {
+				case '$SYS/broker/version':
+					self.brokerVersion = message.payloadString;
+					break;
+				case '$SYS/broker/timestamp':
+					self.brokerTimestamp = message.payloadString;
+					break;
+				case '$SYS/broker/uptime':
+					self.brokerUptime = message.payloadString;
+					break;
+				case '$SYS/broker/subscriptions/count':
+					self.brokerSubscriptions = message.payloadString;
+					break;
+				case '$SYS/broker/clients/connected':
+					self.clientsConnected = message.payloadString;
+					break;
+				case '$SYS/broker/clients/disconnected':
+					self.clientsDisconnected = message.payloadString;
+					break;
+				case '$SYS/broker/clients/expired':
+					self.clientsExpired = message.payloadString;
+					break;
+				case '$SYS/broker/messages/sent':
+					self.messagesSent = message.payloadString;
+					break;
+				case '$SYS/broker/messages/received':
+					self.messagesReceived = message.payloadString;
+					break;
+				case '$SYS/broker/messages/stored':
+					self.messagesStored = message.payloadString;
+					break;
+				case '$SYS/broker/bytes/sent':
+					self.trafficSent = message.payloadString;
+					break;
+				case '$SYS/broker/bytes/received':
+					self.trafficReceived = message.payloadString;
+					break;
+			}
+			*/
+	 	},
+		onConnectionLost(e,msg){
+			console.log(e);
+		},
+		onConnectionError(e){
+			console.log(e);
+		}
+	});	
+</script>
+</dom-module>

@@ -1,0 +1,65 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<link rel="import" href="st-rest.html">
+<link rel="import" href="st-utils.html">
+<link rel="import" href="st-odata.html">
+
+<dom-module id="st-repository-location">
+    <template>
+        <st-rest id="rest" ></st-rest>
+        <st-utils id="utils" baseurl='{{baseurl}}'></st-utils>
+        <st-odata id="odata"></st-odata>
+    </template>
+    <script>
+        Polymer({
+            is:'st-repository-location',
+            properties: {
+                baseurl: {
+                    type: String,
+                    notify: true
+                },
+                locationproperties: { 
+                    type: Array,
+                    value: ['id', 'name', 'description', 'location', 'encodingType'],
+                    readOnly: true,
+                },
+                expandproperties: {
+                    type: Array,
+                    value: ['Things', 'HistoricalLocations'],
+                    readOnly: true,
+                }                      
+            },         
+            _checkODATA(odata){
+                var correct = this.$.odata.check('location', odata);
+            },
+
+            get(odata){        
+                this.$.rest.get(this.$.utils.getPath('location'), odata);
+            },
+            getByID(id, odata){
+                this.$.rest.get(this.$.utils.getPath('location', id), odata);
+            },
+            getByThing(thingID, odata){
+                this.$.rest.get(this.$.utils.getPath('location', thingID, 'thing', false), odata);
+            },
+            getByHistoricalLocation(historicalLocationID, odata){
+                this.$.rest.get(this.$.utils.getPath('location', historicalLocationID, 'historicallocation', false), odata);
+            },          
+            post(data){
+                this.$.rest.post(this.$.utils.getPath('location'), data);
+            },
+            postByThing(thingID, data){
+                this.$.rest.post(this.$.utils.getPath('location', thingID, 'thing', false), data);
+            },
+            put(id, data){
+                this.$.rest.put(this.$.utils.getPath('location', id), data);
+            },
+            patch(id, data){
+                this.$.rest.patch(this.$.utils.getPath('location', id), data);
+            },
+            delete(id){
+                this.$.rest.delete(this.$.utils.getPath('location', id));
+            }
+        });
+    </script>
+</dom-module>

@@ -1,0 +1,65 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<link rel="import" href="st-rest.html">
+<link rel="import" href="st-utils.html">
+<link rel="import" href="st-odata.html">
+
+<dom-module id="st-repository-observation">
+    <template>
+        <st-rest id="rest" ></st-rest>
+        <st-utils id="utils" baseurl='{{baseurl}}'></st-utils>
+        <st-odata id="odata"></st-odata>
+    </template>
+    <script>
+        Polymer({
+            is:'st-repository-observation',
+            properties: {
+                baseurl: {
+                    type: String,
+                    notify: true
+                },
+                sensorproperties: { 
+                    type: Array,
+                    value: ['id', 'result', 'phenomenonTime', 'resultTime', 'resultQuality', 'validTime', 'parameters'],
+                    readOnly: true,
+                },
+                expandproperties: {
+                    type: Array,
+                    value: ['Datastream', 'FeatureOfInterest'],
+                    readOnly: true,
+                }                      
+            },         
+            _checkODATA(odata){
+                var correct = this.$.odata.check('observation', odata);
+            },
+
+            get(odata){        
+                this.$.rest.get(this.$.utils.getPath('observation'), odata);
+            },
+            getByID(id, odata){
+                this.$.rest.get(this.$.utils.getPath('observation', id), odata);
+            },
+            getByDatastream(datastreamID, odata){
+                this.$.rest.get(this.$.utils.getPath('observation', datastreamID, 'datastream', false), odata);
+            },    
+            getByFeatureOfInterest(featureOfInterestID, odata){
+                this.$.rest.get(this.$.utils.getPath('observation', featureOfInterestID, 'featureofinterest', false), odata);
+            },       
+            post(data){
+                this.$.rest.post(this.$.utils.getPath('observation'), data);
+            },
+            postByDatastream(datastreamID, data){
+                this.$.rest.post(this.$.utils.getPath('observation', datastreamID, 'datastream', false), data);
+            },
+            put(id, data){
+                this.$.rest.put(this.$.utils.getPath('observation', id), data);
+            },
+            patch(id, data){
+                this.$.rest.patch(this.$.utils.getPath('observation', id), data);
+            },
+            delete(id){
+                this.$.rest.delete(this.$.utils.getPath('observation', id));
+            }
+        });
+    </script>
+</dom-module>

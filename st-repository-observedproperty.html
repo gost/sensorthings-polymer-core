@@ -1,0 +1,59 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<link rel="import" href="st-rest.html">
+<link rel="import" href="st-utils.html">
+<link rel="import" href="st-odata.html">
+
+<dom-module id="st-repository-observedproperty">
+    <template>
+        <st-rest id="rest" ></st-rest>
+        <st-utils id="utils" baseurl='{{baseurl}}'></st-utils>
+        <st-odata id="odata"></st-odata>
+    </template>
+    <script>
+        Polymer({
+            is:'st-repository-observedproperty',
+            properties: {
+                baseurl: {
+                    type: String,
+                    notify: true
+                },
+                sensorproperties: { 
+                    type: Array,
+                    value: ['id', 'name', 'definition', 'description'],
+                    readOnly: true,
+                },
+                expandproperties: {
+                    type: Array,
+                    value: ['Datastreams'],
+                    readOnly: true,
+                }                      
+            },         
+            _checkODATA(odata){
+                var correct = this.$.odata.check('observedproperty', odata);
+            },
+
+            get(odata){        
+                this.$.rest.get(this.$.utils.getPath('observedproperty'), odata);
+            },
+            getByID(id, odata){
+                this.$.rest.get(this.$.utils.getPath('observedproperty', id), odata);
+            },
+            getByDatastream(datastreamID, odata){
+                this.$.rest.get(this.$.utils.getPath('observedproperty', datastreamID, 'datastream', true), odata);
+            },        
+            post(data){
+                this.$.rest.post(this.$.utils.getPath('observedproperty'), data);
+            },
+            put(id, data){
+                this.$.rest.put(this.$.utils.getPath('observedproperty', id), data);
+            },
+            patch(id, data){
+                this.$.rest.patch(this.$.utils.getPath('observedproperty', id), data);
+            },
+            delete(id){
+                this.$.rest.delete(this.$.utils.getPath('observedproperty', id));
+            }
+        });
+    </script>
+</dom-module>

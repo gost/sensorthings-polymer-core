@@ -1,0 +1,59 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<link rel="import" href="st-rest.html">
+<link rel="import" href="st-utils.html">
+<link rel="import" href="st-odata.html">
+
+<dom-module id="st-repository-featureofinterest">
+    <template>
+        <st-rest id="rest" ></st-rest>
+        <st-utils id="utils" baseurl='{{baseurl}}'></st-utils>
+        <st-odata id="odata"></st-odata>
+    </template>
+    <script>
+        Polymer({
+            is:'st-repository-featureofinterest',
+            properties: {
+                baseurl: {
+                    type: String,
+                    notify: true
+                },
+                featureofinterestproperties: { 
+                    type: Array,
+                    value: ['id', 'name', 'description', 'encodingType', 'feature'],
+                    readOnly: true,
+                },
+                expandproperties: {
+                    type: Array,
+                    value: ['Observations'],
+                    readOnly: true,
+                }                      
+            },         
+            _checkODATA(odata){
+                var correct = this.$.odata.check('featureofinterest', odata);
+            },
+
+            get(odata){        
+                this.$.rest.get(this.$.utils.getPath('featureofinterest'), odata);
+            },
+            getByID(id, odata){
+                this.$.rest.get(this.$.utils.getPath('featureofinterest', id), odata);
+            },
+            getByObservation(observationID, odata){
+                this.$.rest.get(this.$.utils.getPath('featureofinterest', observationID, 'observation', true), odata);
+            },        
+            post(data){
+                this.$.rest.post(this.$.utils.getPath('featureofinterest'), data);
+            },
+            put(id, data){
+                this.$.rest.put(this.$.utils.getPath('featureofinterest', id), data);
+            },
+            patch(id, data){
+                this.$.rest.patch(this.$.utils.getPath('featureofinterest', id), data);
+            },
+            delete(id){
+                this.$.rest.delete(this.$.utils.getPath('featureofinterest', id));
+            }
+        });
+    </script>
+</dom-module>

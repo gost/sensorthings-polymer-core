@@ -1,0 +1,95 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+
+<dom-module id="st-odata">
+    <template>
+
+    </template>    
+    <script>
+        Polymer({
+            is:'st-odata',
+            properties: {
+                top: {
+                    type: Number,
+                    notify: true
+                },
+                skip: {
+                    type: Number,
+                    notify: true
+                },
+                select: {
+                    type: Array,
+                    notify: true
+                },
+                expand: {
+                    type: Array,
+                    notify: true
+                },
+                filter: {
+                    type: String,
+                    notify: true
+                },
+                orderby: {
+                    type: Array,
+                    notify: true
+                },
+                count: {
+                    type: Boolean,
+                    notify: true,
+                    value: false
+                },
+            },  
+            _setTop(params, top){
+                if(top){
+                    params.$top = top;
+                }
+            },
+            _setSkip(params, skip){
+                if(skip){
+                    params.$skip = skip;
+                }
+            },
+            _setSelect(params, select){
+                if(select){
+                    params.$select = select.join(',');
+                }
+            },
+            _setExpand(params, expand){
+                if(expand){
+                    params.$expand = expand.join(',');
+                }
+            },
+            _setFilter(params, filter){
+                if(filter){
+                    params.$filter = filter;
+                }
+            },
+            _setOrderBy(params, orderby){
+                if(orderby){
+
+                }
+            },
+            _setCount(params, count){
+                if(count){
+                    params.$count = count;
+                }
+            },
+            check(type, odata){
+                // ToDo: check if all selects, orderby, etc are correct based on type
+                return true;
+            },
+            constructParams(odata){
+                var params = {};
+                this._setTop(params, odata ? odata.top : this.top);
+                this._setSkip(params, odata ? odata.skip : this.skip);
+                this._setSelect(params, odata ? odata.select : this.select);
+                this._setExpand(params, odata ? odata.expand : this.expand);
+                this._setFilter(params, odata ? odata.filter : this.filter);
+                this._setOrderBy(params, odata ? odata.orderby : this.orderby);                
+                this._setCount(params, odata ? odata.count : this.count);   
+
+                return params;
+            }
+        });
+    </script>
+</dom-module>

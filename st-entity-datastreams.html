@@ -1,0 +1,115 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<link rel="import" href="st-repository-datastream.html">
+<link rel="import" href="st-utils.html">
+
+<dom-module id="st-entity-datastreams" odata="{{odata}}">
+    <template>     
+        <st-repository-datastream id="datastreamrepo" baseurl='{{baseurl}}' on-getdone='_datastreamsReceived'></st-repository-datastream>
+        <st-utils id="utils" baseurl='{{baseurl}}'></st-utils>
+    </template>
+
+    <script>
+        Polymer({
+            is:'st-entity-datastreams',
+            properties: {
+                auto: {
+                    type: Boolean,
+                    value: false
+                },
+                baseurl: {
+                    type: String,
+                    notify: true
+                },
+                odata: {
+                    type: Object
+                },
+                thingid: {
+                    type: Number,
+                    notify: true
+                },
+                sensorid: {
+                    type: Number,
+                    notify: true
+                },
+                observedpropertyid: {
+                    type: Number,
+                    notify: true
+                },
+                collection: {
+                    type: Array,
+                    notify: true
+                },            
+                count: {
+                    type: Number,
+                    notify: true
+                },
+                nextlink: {
+                    type: String,
+                    notify: true
+                }
+            },
+            _datastreamsReceived(res){
+                var data = res.detail.response;
+                if(data['@iot.count']) { this.count = data['@iot.count']; }                
+                if(data.value) { this.collection = data.value; }
+                this.nextlink = data['@iot.nextLink'] ? data['@iot.nextLink'] : "";                
+            },
+            get(){
+                if(this.thingid) {
+                    this.getByThing();
+                } else if (this.sensorid) {
+                    this.getBySensor();
+                } else if (this.observedpropertyid) {
+                    this.getByObservedProperty();
+                } else {
+                    this.$.datastreamrepo.get(this.odata);
+                }                
+            },
+            getByThing(thingID){
+                if(thingID){
+                    this.thingid = thingID;
+                }
+
+                this.$.datastreamrepo.getByThing(this.thingid, this.odata);
+            },
+            getBySensor(sensorID){
+                if(sensorID){
+                    this.sensorid = sensorID;
+                }
+
+                this.$.datastreamrepo.getBySensor(this.sensorid, this.odata);
+            },
+            getByObservedProperty(observedPropertyID){
+                if(observedPropertyID){
+                    this.observedpropertyid = observedPropertyID;
+                }
+
+                this.$.datastreamrepo.getByObservedProperty(this.observedpropertyid, this.odata);
+            },
+            getNextPage(){
+                if(this.nextlink) {
+                    this.$.utils.updateOdataForNextLink(this.odata, this.nextlink);
+                    this.get();
+                } else {
+                    throw "No nextlink available";
+                }
+            },
+            post(data){
+                this.$.datastreamrepo.post(data);
+            },
+            postByThing(thingID, data){
+                if(thingID){
+                    this.thingid = thingID;
+                }
+
+                this.$.datastreamrepo.postByThing(this.thingid, data);
+            },
+            ready(){
+                if(this.auto){
+                   this.get();
+                }
+            }
+        });
+    </script>
+</dom-module>

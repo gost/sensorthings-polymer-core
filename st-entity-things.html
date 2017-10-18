@@ -1,0 +1,82 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<link rel="import" href="st-repository-thing.html">
+<link rel="import" href="st-utils.html">
+
+<dom-module id="st-entity-things" odata="{{odata}}">
+    <template>     
+        <st-repository-thing id="thingrepo" baseurl='{{baseurl}}' on-getdone='_thingsReceived'></st-repository-thing>
+        <st-utils id="utils" baseurl='{{baseurl}}'></st-utils>
+    </template>
+
+    <script>
+        Polymer({
+            is:'st-entity-things',
+            properties: {
+                auto: {
+                    type: Boolean,
+                    value: false
+                },
+                baseurl: {
+                    type: String,
+                    notify: true
+                },
+                odata: {
+                    type: Object
+                },
+                locationid: {
+                    type: Number,
+                    notify: true
+                },
+                collection: {
+                    type: Array,
+                    notify: true
+                },            
+                count: {
+                    type: Number,
+                    notify: true
+                },
+                nextlink: {
+                    type: String,
+                    notify: true
+                }
+            },
+            _thingsReceived(res){
+                var data = res.detail.response;
+                if(data['@iot.count']) { this.count = data['@iot.count']; }                
+                if(data.value) { this.collection = data.value; }
+                this.nextlink = data['@iot.nextLink'] ? data['@iot.nextLink'] : "";                
+            },
+            get(){
+                if(this.locationid) {
+                    this.getByLocation();
+                } else {
+                    this.$.thingrepo.get(this.odata);
+                }                
+            },
+            getByLocation(locationID){
+                if(locationID){
+                    this.locationid = locationID;
+                }
+
+                this.$.thingrepo.getByLocation(this.locationid, this.odata);
+            },
+            getNextPage(){
+                if(this.nextlink) {
+                    this.$.utils.updateOdataForNextLink(this.odata, this.nextlink);
+                    this.get();
+                } else {
+                    throw "No nextlink available";
+                }
+            },
+            post(data){
+                this.$.thingrepo.post(data);
+            },
+            ready(){
+                if(this.auto){
+                   this.get();
+                }
+            }
+        });
+    </script>
+</dom-module>

@@ -1,0 +1,106 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+
+<dom-module id="st-rest">
+    <template>
+        <iron-ajax id='requestGet'
+            method='GET'
+            handle-as="json"
+            on-response="_handleGet"
+            on-error="_handleGetError"
+            debounce-duration="300"></iron-ajax>
+        <iron-ajax id='requestPost'
+            method='POST'
+            handle-as="json"
+            content-type="application/json"
+            on-response="_handlePost"
+            on-error="_handlePostError"
+            debounce-duration="300"></iron-ajax>
+        <iron-ajax id='requestPut'
+            method='PUT'
+            handle-as="json"
+            content-type="application/json"
+            on-response="_handlePut"
+            on-error="_handlePutError"
+            debounce-duration="300"></iron-ajax>
+        <iron-ajax id='requestPatch'
+            method='PATCH'
+            handle-as="json"
+            content-type="application/json"
+            on-response="_handlePatch"
+            on-error="_handlePatchError"
+            debounce-duration="300"></iron-ajax>
+        <iron-ajax id='requestDelete'
+            method='DELETE'
+            handle-as="json"
+            on-response="_handleDelete"
+            on-error="_handleDeleteError"
+            debounce-duration="300"></iron-ajax>
+
+        <gost-odata id="odata"></gost-odata>
+    </template>    
+    <script>
+        Polymer({
+            is:'st-rest',
+            properties: {
+            },  
+            _handleGet(response){                
+                this._triggerEvent('getdone', response);
+            },
+            _handleGetError(response){                
+                this._triggerEvent('geterror', response);
+            },   
+            _handlePost(response){                                
+                this._triggerEvent('postdone', response);
+            },
+            _handlePostError(response){                
+                this._triggerEvent('posterror', response);
+            },  
+            _handlePut(response){                                
+                this._triggerEvent('putdone', response);
+            },
+            _handlePutError(response){                
+                this._triggerEvent('puterror', response);
+            }, 
+            _handlePatch(response){                                
+                this._triggerEvent('patchdone', response);
+            },
+            _handlePatchError(response){                
+                this._triggerEvent('patcherror', response);
+            },  
+            _handleDelete(response){                                
+                this._triggerEvent('deletedone', response);
+            },
+            _handleDeleteError(response){
+                this._triggerEvent('deleteerror', response);
+            },
+            _triggerEvent(eventName, response){
+                this.dispatchEvent(new CustomEvent(eventName, { detail: response.detail, bubbles: true }));
+            },
+            get(url, odata){                        
+                this.$.requestGet.url = url;
+                this.$.requestGet.params = this.$.odata.constructParams(odata);
+                this.$.requestGet.generateRequest();
+            },
+            post(url, data){        
+                this.$.requestPost.url = url;
+                this.$.requestPost.body = data;
+                this.$.requestPost.generateRequest();
+            },
+            put(url, data){        
+                this.$.requestPut.url = url;
+                this.$.requestPut.body = data;
+                this.$.requestPut.generateRequest();
+            },
+            patch(url, data){        
+                this.$.requestPatch.url = url;
+                this.$.requestPatch.body = data;
+                this.$.requestPatch.generateRequest();
+            },
+            delete(url){
+                this.$.requestDelete.url = url;
+                this.$.requestDelete.generateRequest();
+            }
+        });
+    </script>
+</dom-module>
