@@ -83,14 +83,14 @@
                 }
             },
             post(data){
-                this.$.locationrepo.post(data);
+                this.$.historicallocationrepo.post(data);
             },
             postByThing(thingID, data){
                 if(thingID){
                     this.thingid = thingID;
                 }
 
-                this.$.locationrepo.postByThing(this.thingid, data);
+                this.$.historicallocationrepo.postByThing(this.thingid, data);
             },
             ready(){
                 if(this.auto){

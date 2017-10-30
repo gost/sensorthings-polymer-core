@@ -88,7 +88,7 @@
                 if (this.datastreamid) {
                     this.getByDatastream();
                 } else {
-                    this.$.sensorrepo.getByID(this.gid, this.odata);
+                    this.$.observedpropertyrepo.getByID(this.gid, this.odata);
                 }               
             },
             getByDatastream(datastreamID){
@@ -96,16 +96,16 @@
                     this.datastreamid = datastreamID;
                 }
 
-                this.$.sensorrepo.getByDatastream(this.datastreamid, this.odata);
+                this.$.observedpropertyrepo.getByDatastream(this.datastreamid, this.odata);
             },     
             put(){                
-                this.$.sensorrepo.put(this.gid, this._createObservedPropertyObject());
+                this.$.observedpropertyrepo.put(this.gid, this._createObservedPropertyObject());
             },
             patch(){
-                this.$.sensorrepo.patch(this.gid, this._createObservedPropertyObject());
+                this.$.observedpropertyrepo.patch(this.gid, this._createObservedPropertyObject());
             },
             delete(){
-                this.$.sensorrepo.delete(this.gid);
+                this.$.observedpropertyrepo.delete(this.gid);
             },
             _createObservedPropertyObject(){
                 return {

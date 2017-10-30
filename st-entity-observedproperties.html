@@ -44,7 +44,7 @@
                 this.nextlink = data['@iot.nextLink'] ? data['@iot.nextLink'] : "";                
             },
             get(){
-                this.$.sensorrepo.get(this.odata);               
+                this.$.observedpropertyrepo.get(this.odata);               
             },
             getNextPage(){
                 if(this.nextlink) {
@@ -55,7 +55,7 @@
                 }
             },
             post(data){
-                this.$.sensorrepo.post(data);
+                this.$.observedpropertyrepo.post(data);
             },
             ready(){
                 if(this.auto){
