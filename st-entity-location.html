@@ -80,6 +80,10 @@
                 this.deleted = true;
             },
             _rawChanged(){
+                if(!this.rawreceived){
+                    return;
+                }
+                
                 if(this.rawreceived['@iot.id']) { this.gid = this.rawreceived['@iot.id']; }
                 if(this.rawreceived.name) { this.name = this.rawreceived.name; }
                 if(this.rawreceived.description) { this.description = this.rawreceived.description; }
