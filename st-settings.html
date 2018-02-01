@@ -20,6 +20,7 @@
                 window.st = {};
                 window.st.endpoint = this.cfg.endpoint ?  this.cfg.endpoint : "http://localhost:8080/v1.0";
                 window.st.maxEntities = this.cfg.maxEntities ? this.cfg.maxEntities : 20;
+                window.st.mqtt =  this.cfg.mqtt;
             }   ,
             ready(){
                 this.cfg = {};
